@@ -104,19 +104,19 @@ twice f = g
         -- def. de g con x <- doble
     twice (twice doble) 3
         -- def. de twice, con f <- (twice doble)
-    g 3
-        -- donde g x = (twice doble) ((twice doble) x)
-        -- def. de g con x <- 3
+    g' 3
+        -- donde g' x = (twice doble) ((twice doble) x)
+        -- def. de g' con x <- 3
     (twice doble) ((twice doble) 3)
         -- def. de twice, con f <- doble
-    (twice doble) (g 3)
-        -- donde g x = doble (doble x)
-        -- def. de g con x <- 3
+    (twice doble) (g'' 3)
+        -- donde g'' x = doble (doble x)
+        -- def. de g'' con x <- 3
     (twice doble) (doble (doble 3))
         -- def. de twice, con f <- doble
-    g (doble (doble 3))
-        -- donde g x = doble (doble x)
-        -- def. de g con x <- (doble (doble 3)) 
+    g''' (doble (doble 3))
+        -- donde g''' x = doble (doble x)
+        -- def. de g''' con x <- (doble (doble 3)) 
     doble (doble (doble (doble 3)))
         -- def de doble con x <- 3
     doble (doble (doble (3 + 3)))
@@ -134,5 +134,4 @@ twice f = g
     24 + 24
         -- def de suma
     48
-
  -}

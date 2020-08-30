@@ -135,3 +135,32 @@ twice f = g
         -- def de suma
     48
  -}
+
+-- Ejercicio 8
+
+triple' = \x -> 3 * x
+succ'' =  \x -> x + 1
+sumarDos' = \x -> x + 2
+twice' = \f -> \x -> f (f x)
+twiceTwice = \f -> \x -> f (f (f (f x)))
+twiceTwice' = \f -> twice twice f
+
+-- Ejercicio 9
+fa x = 
+    let (y,z) = (x,x) 
+    in y
+
+fa' x = x
+
+fb (x,y) = 
+    let z = x + y 
+    in g (z,y) 
+    where g (a,b) = a - b
+
+fb' (x,y) = x
+
+fc p = case p of (x,y) -> x
+
+fd = \p -> let (x,y) = p in y
+
+fd' = \(x,y) -> y

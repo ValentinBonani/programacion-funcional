@@ -57,16 +57,16 @@ doble :: Num a => a -> a
 doble x = x + x
 
 e41 :: a -> a
-e41 = ((apply apply) apply)
+e41 = (apply apply) apply
 
 e42 :: Int
-e42 = ((twice doble) 2)
+e42 = (twice doble) 2
 
 {- e43 :: (a,b) -> (a,b) -}
-e43 = (((twice twice) twice) swap) 
+e43 = ((twice twice) twice) swap
 
 e44 :: Int
-e44 = (((flip twice) 1) doble)
+e44 = ((flip twice) 1) doble
 
 
 -- Ejercicio 5
@@ -132,6 +132,7 @@ many n f x = f (many (n-1) f x)
     doble (doble (doble (2)))
  -}
 
+many' :: Int -> (a -> a) -> a -> a
 many' 0 f = id
 many' n f = f . many (n-1) f
 
@@ -144,3 +145,28 @@ many' n f = f . many (n-1) f
 -}
 
 {- many' n f = f . (many (n-1) f) -}
+
+-- Ejercicio 8
+
+{- 
+    e8a :: (Int -> Int) -> Int -> Int (NO)
+    e8b :: (a -> b -> c) -> (a -> b) -> c (NO)
+    e8c :: (a -> b, c -> d) -> (a, c) -> (b, d) (NO)
+    e8d :: ((a, a) -> b) -> a -> b (NO)
+    e8e :: (a -> b -> c) -> b -> a -> c (NO)
+    e8f :: (a -> b) -> (a, a) -> (b, b) (NO)
+    e8g :: (a -> b, a -> c) -> a -> (b, c) (NO)
+    e8h :: (a -> b -> c) -> (a -> b) -> a -> c (CASI SEGURO)
+    e8i :: a -> b -> a (NO)
+-}
+
+-- Ejercicio 9
+
+cuadruple = doble . doble 
+timesTwoPlusThree = (+3) . doble
+
+fourTimes f  = f . f . f . f 
+
+-- Ejercicio 10
+
+(&&) True False

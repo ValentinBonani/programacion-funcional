@@ -1,6 +1,5 @@
 -- Ejercicio 1 
 
-
 first :: (a,b) -> a
 first (x,y) = x
 
@@ -11,7 +10,7 @@ apply :: (a -> b) -> (a -> b)
 apply f = g
     where g x = f x
 
-{- twice :: (a -> a) -> (a -> a) -}
+twice :: (a -> a) -> (a -> a) 
 twice f = g
     where g x = f (f x)
 
@@ -179,4 +178,3 @@ c7 = appDup id {-  :: \x -> (x,x) == a7 -}
 d7 =  appDup appFork {- :: \f -> \x -> (f x, f x) == b7 -}
 e7 = flip (appDup const) {- :: \x -> \y -> (y,y) == f7 -}
 f7 = const (appDup id) {- :: \x -> \y -> (y,y) == e7  -}
-

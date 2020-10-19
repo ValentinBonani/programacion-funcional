@@ -397,8 +397,8 @@ tieneElemento e Nothing = 0
 
 cantidadDePuntosCon :: a -> Dungeon -> Int
 cantidadDePuntosCon e (Habitacion a) = tieneElemento e (Just a)
-cantidadDePuntosCon e (Pasaje m d) = (tieneElemento e m) + cantidadDePuntosCon d
-cantidadDePuntosCon e (Bifurcacion m d1 d2) = (tieneElemento e m) + cantidadDePuntosCon d1 + cantidadDePuntosCon d2
+cantidadDePuntosCon e (Pasaje m d) = (tieneElemento e m) + cantidadDePuntosCon e d
+cantidadDePuntosCon e (Bifurcacion m d1 d2) = (tieneElemento e m) + cantidadDePuntosCon e d1 + cantidadDePuntosCon e d2
 
 esLineal :: Dungeon -> Bool
 esLineal (Habitacion a) = True
@@ -463,31 +463,67 @@ if ((Criatura Troll) == (Objeto Oro)) then 1 else 0
 -- def ==
 if (False) then 1 else 0
 -- def if
-    
+0
 
 
 b. cantidadDePuntosCon (Criatura Troll) (Pasaje (Just (Criatura Troll)) (Habitacion (Objeto Oro)))) = 1
 -- def cantidadDePuntosCon
-(tieneElemento (Criatura Troll) (Just (Criatura Troll))) + cantidadDePuntosCon (Habitacion (Objeto Oro))
+(tieneElemento (Criatura Troll) (Just (Criatura Troll))) + cantidadDePuntosCon (Criatura Troll) (Habitacion (Objeto Oro))
 -- def cantidadDePuntosCon
-(tieneElemento (Criatura Troll) (Just (Criatura Troll))) + 0
+(tieneElemento (Criatura Troll) (Just (Criatura Troll))) + tieneElemento (Criatura Troll) (Objeto Oro)
 -- def tieneElemento
 1 + 0
 -- aritmetica
 1
 
 
-c. cantidadDePuntosCon (Criatura Troll) (Pasaje (Just (Criatura Troll)) (Habitacion (Criatura Troll)))) = 2
+c. cantidadDePuntosCon (Criatura Troll) (Pasaje (Just (Criatura Troll)) (Habitacion (Criatura Troll))) = 2
 -- def cantidadDePuntosCon
-(tieneElemento (Criatura Troll) (Just (Criatura Troll))) + cantidadDePuntosCon (Habitacion (Criatura Troll))
+(tieneElemento (Criatura Troll) (Just (Criatura Troll))) + cantidadDePuntosCon (Criatura Troll) (Habitacion (Criatura Troll))
 -- def cantidadDePuntosCon
-(tieneElemento (Criatura Troll) (Just (Criatura Troll))) + 1
+(tieneElemento (Criatura Troll) (Just (Criatura Troll))) + tieneElemento (Criatura Troll) (Just (Criatura Troll))
 -- def tieneElemento
 1 + 1
 -- aritmetica
 2
 
+d. cantidadDePuntosCon (Criatura Troll) 
+(Bifurcacion (Just (Criatura Troll)) (Pasaje (Just (Criatura Troll)) (Habitacion (Objeto Oro))) (Pasaje (Just (Criatura Troll)) (Habitacion (Criatura Troll)))) 
+= 4
+
+cantidadDePuntosCon (Criatura Troll) 
+(Bifurcacion (Just (Criatura Troll)) (Pasaje (Just (Criatura Troll)) (Habitacion (Objeto Oro))) (Pasaje (Just (Criatura Troll)) (Habitacion (Criatura Troll)))) 
+--def de cantidadDePuntosCon
+(tieneElemento (Criatura Troll) (Just (Criatura Troll)) +
+cantidadDePuntosCon (Criatura Troll) (Pasaje (Just (Criatura Troll)) (Habitacion (Objeto Oro))) +
+cantidadDePuntosCon (Criatura Troll) (Pasaje (Just (Criatura Troll)) (Habitacion (Criatura Troll)))
+--def de cantidadDePuntosCon del medio
+(tieneElemento (Criatura Troll) (Just (Criatura Troll)) +
+(tieneElemento (Criatura Troll) (Just (Criatura Troll)) + cantidadDePuntosCon (Criatura Troll) (Habitacion (Objeto Oro)) +
+cantidadDePuntosCon (Criatura Troll) (Pasaje (Just (Criatura Troll)) (Habitacion (Criatura Troll)))
+--def de cantidadDePuntosCon del medio
+(tieneElemento (Criatura Troll) (Just (Criatura Troll)) +
+(tieneElemento (Criatura Troll) (Just (Criatura Troll)) + tieneElemento (Criatura Troll) (Just (Objeto Oro)) +
+cantidadDePuntosCon (Criatura Troll) (Pasaje (Just (Criatura Troll)) (Habitacion (Criatura Troll)))
+--def de cantidadDePuntosCon
+(tieneElemento (Criatura Troll) (Just (Criatura Troll)) +
+(tieneElemento (Criatura Troll) (Just (Criatura Troll)) + tieneElemento (Criatura Troll) (Just (Objeto Oro)) +
+(tieneElemento (Criatura Troll) (Just (Criatura Troll)) + cantidadDePuntosCon (Criatura Troll) (Habitacion (Criatura Troll))
+--def de cantidadDePuntosCon
+(tieneElemento (Criatura Troll) (Just (Criatura Troll)) +
+(tieneElemento (Criatura Troll) (Just (Criatura Troll)) + tieneElemento (Criatura Troll) (Just (Objeto Oro)) +
+(tieneElemento (Criatura Troll) (Just (Criatura Troll)) + tieneElemento (Criatura Troll) (Just (Criatura Troll))
+--def de tieneElemento x5
+1 +
+1 + 0 +
+1 + 1
+-- aritmetica
+
+= 4
+
+
+
 cantidadDePuntosCon :: a -> Dungeon -> Int
-cantidadDePuntosCon _ (Habitacion a) = 0
-cantidadDePuntosCon e (Pasaje m d) = (tieneElemento e m) + cantidadDePuntosCon d
-cantidadDePuntosCon e (Bifurcacion m d1 d2) = (tieneElemento e m) + cantidadDePuntosCon d1 + cantidadDePuntosCon d2
+cantidadDePuntosCon e (Habitacion a) = tieneElemento e (Just a)
+cantidadDePuntosCon e (Pasaje m d) = (tieneElemento e m) + cantidadDePuntosCon e d
+cantidadDePuntosCon e (Bifurcacion m d1 d2) = (tieneElemento e m) + cantidadDePuntosCon e d1 + cantidadDePuntosCon e d2

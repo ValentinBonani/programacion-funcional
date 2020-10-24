@@ -391,6 +391,11 @@ Caso Ind)
 -- LEMA VALENTONGUERO
 null (xs ++ ys) = null xs && null ys -- y seguro que esta bien
 
+para todo xs. para todo ys. 
+    elem e (xs ++ ys) == elem e xs || elem e ys
+Dem: Sean xs e ys listas cualesquiera
+Caso Base) elem e ([] ++ ys) == elem e [] || elem e ys
+
 
 
 null :: [a] -> Bool

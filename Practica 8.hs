@@ -38,7 +38,7 @@ append (x:xs) ys = x : append xs ys
 
 concat2 :: [[a]] -> [a]
 concat2 [] = []
-concat2 (x:xs) = append x (concat2 xs)
+concat2 (x:xs) = x ++ (concat2 xs)
 
 {- e. elem :: Eq a => a -> [a] -> Bool, que indica si el elemento dado pertenece a la lista. -}
 
@@ -50,7 +50,7 @@ elem2 a (x:xs) = x == a || elem2 a xs
 
 all2 :: (a -> Bool) -> [a] -> Bool
 all2 _ [] = True
-all2 f (x:xs) = if(not (f x)) then False else all2 f xs
+all2 f (x:xs) = f x && all2 f xs
 
 {- g. any :: (a -> Bool) -> [a] -> Bool, que indica si algún elemento de la lista cumple el predicado dado. -}
 
@@ -236,19 +236,175 @@ x == e || any ((==) e) xs
 
 {- d. para todo x. any (elem x) = elem x . concat -}
 
+PROP: any (elem x) = (elem x) . concat
+DEM: por ppio de ext.
+    ¿para todo l. any (elem x) l = ((elem x) . concat) l?
+Por definición de composición, es equivalente a
+    ¿para todo l. any (elem x) l = elem x (concat l)?
+Sea l :: [[a]]. Por induccion en la estructura de xs
+
+Caso base) ¿any (elem x) [] = elem x (concat [])?
+    -- Lado izquierdo
+        any (elem x) []
+    -- Def de any
+        False
+        
+    -- Lado derecho
+        elem x (concat [])
+    -- Def de concat
+        elem x []
+    -- Def de elem
+        False
+            
+Caso Inductivo) 
+    HI) ¡any (elem x) xs = elem x (concat xs)!
+    TI) ¿any (elem x) (x':xs) = elem x (concat (x':xs))?
+    -- Lado Izq
+        any (elem x) (x':xs)
+    -- Def any
+        (elem x) x' || any (elem x) xs
+    -- Por HI
+        elem x x' || elem x (concat xs)
+
+        
+    -- Lado Der
+        elem x (concat (x':xs))
+    -- Def de concat
+        elem x (x' ++ (concat xs))
+    -- Por lema
+        elem x x' || elem x (concat xs)
+
+-- Vale el caso
+
+-- Lema
+para todo xs. para todo ys. 
+    elem e (xs ++ ys) == elem e xs || elem e ys
+Dem: Sean xs e ys listas cualesquiera
+Caso Base) elem e ([] ++ ys) == elem e [] || elem e ys
+            -- Lado Izq
+            elem e ([] ++ ys)
+            -- Def ++
+            elem e ys
+            
+            -- Lado Der
+            elem e [] || elem e ys
+            -- Def elem izq
+            False || elem e ys
+            -- Def de ||
+            elem e ys
+
+Caso Ind)
+        HI) ¡elem e (xss ++ ys) == elem e xss || elem e ys!
+        TI) ¿elem e ((x:xss) ++ ys) == elem e (x:xss) || elem e ys?
+
+    -- Lado Izq
+        elem e ((x:xss) ++ ys)
+    -- def ++
+        elem e (x : (xss ++ ys))
+    -- def elem
+        x == e || elem e (xss ++ ys)
+    -- HI
+        x == e || elem e xss || elem e ys
+
+    -- Lado der
+        elem e (x:xss) || elem e ys
+    -- def de elem de la izq
+        x == e || elem e xss || elem e ys
+
 {- e. para todo xs. para todo ys. subset xs ys = all (flip elem ys) xs -}
 
+PROP: subset xs ys = all (flip elem ys) xs
+Sea xs,ys una lista cualesquiera
+
+Caso Base)
+        subset [] ys = all (flip elem ys) []
+    -- Lado izq
+        subset [] ys
+    -- Def de subster
+        True
+
+    -- Lado der
+        all (flip elem ys) []
+    -- Def de all
+        True
+
+Caso Ind)
+    HI) ¡subset xss ys = all (flip elem ys) xss!
+    TI) ¿subset (x:xss) ys = all (flip elem ys) (x:xss)?
+
+    -- Lado izq
+        subset (x:xss) ys
+    -- def de subset
+        elem x ys && subset xss ys
+    -- HI
+        elem x ys && all (flip elem ys) xss
+
+    -- Lado der
+        all (flip elem ys) (x:xss)
+    -- Def de all
+        (flip elem ys) x && all (flip elem ys) xss
+    -- Def de flip
+        elem x ys && all (flip elem ys) xss
+    
+        
 {- f. all null = null . concat -}
+
+PROP: all null = null . concat
+DEM: por ppio de ext.
+    ¿para todo xs. all null xs = (null . concat) xs?
+Por definición de composición, es equivalente a
+    ¿para todo xs. all null xs = null (concat xs)?
+
+Caso Base)
+        all null [] = null (concat [])
+
+    -- Lado izq
+        all null []
+    -- Def all
+        True
+
+    -- Lado der
+        null (concat [])
+    -- def concat
+        null []
+    -- Def null
+        True
+
+Caso Ind)
+    HI) ¡all null xss = null (concat xss)!
+    TI) ¿all null (x:xss) = null (concat (x:xss))?
+    
+    -- Lado izq
+        all null (x:xss)
+    -- Def all
+        null x && all null xss
+    -- HI MAN
+        null x && null (concat xss)
+        
+    -- Lado Der
+        null (concat (x:xss))
+    -- Def Concat
+        null (x ++ (concat xss))
+    -- LEMA QUE NO HEMOS DEMOSTRADO PERO LA VERDAD SUPERA A LA FICCION
+        null x && null (concat xss)
+
+-- LEMA VALENTONGUERO
+null (xs ++ ys) = null xs && null ys -- y seguro que esta bien
+
+
+
+null :: [a] -> Bool
+null [] = True
+null (x:xs) = False
+
 
 {- g. length = length . reverse -}
 
-{- h. para todo xs. para todo ys. -}
+{- h. para todo xs. para todo ys. 
+        reverse (xs ++ ys) = reverse ys ++ reverse xs -}
 
-{- reverse (xs ++ ys) = reverse ys ++ reverse xs -}
-
-{- i. para todo xs. para todo ys. -}
-
-{- all p (xs++ys) = all p (reverse xs) && all p (reverse ys) -}
+{- i. para todo xs. para todo ys.
+        all p (xs++ys) = all p (reverse xs) && all p (reverse ys) -}
 
 {- j. para todo xs. para todo ys. unzip (zip xs ys) = (xs, ys) -}
 

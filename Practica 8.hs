@@ -90,6 +90,8 @@ reverse2 (x:xs) =  reverse2 xs ++ [x]
 
 zip2 :: [a] -> [b] -> [(a,b)]
 zip2 [] [] = []
+zip2 (x:xs) [] = []
+zip2 [] (y:ys) = []
 zip2 (x:xs) (y:ys) = (x,y) : (zip2 xs ys)
 
 {- m. unzip :: [(a,b)] -> ([a],[b]), que describe el par de listas que resulta de desarmar la lista dada; la primera componente del resultado se
@@ -100,6 +102,8 @@ aux2 (x1,y1) (x2,y2) = (append x1 x2, append y1 y2)
 
 unzip2 :: [(a,b)] -> ([a],[b])
 unzip2 []  = ([],[])
+unzip2 (x:xs) [] = ([],[])
+unzip2 [] (y:ys) = ([],[])
 unzip2 ((x,y):xs) = aux2 ([x],[y]) (unzip2 xs)
 
 -- Ejercicio 2
@@ -405,16 +409,173 @@ null (x:xs) = False
 
 {- g. length = length . reverse -}
 
-{- h. para todo xs. para todo ys. 
-        reverse (xs ++ ys) = reverse ys ++ reverse xs -}
+PROP: length = length . reverse
+DEM: por ppio de ext.
+    ¿para todo xs. length xs = (length . reverse) xs?
+Por definición de composición, es equivalente a
+    ¿para todo xs. length xs = length (reverse xs)?
+
+Caso Base)
+        length [] = length (reverse [])
+    -- lado Der
+        length (reverse [])
+    -- Def reverse
+        length []
+
+Caso Ind)
+    HI) ¡length xss = length (reverse xss)!
+    TI) ¿length (x:xss) = length (reverse (x:xss))?
+
+    -- Lado Der
+        length (reverse (x:xss))
+    --  Def de reverse
+        length (reverse xss ++ [x])
+    -- Por Lema RUBIUMAXIMUS666
+        length (reverse xss) + length [x]
+    -- Def de length de la derecha
+        length (reverse xss) + 1
+    -- HI
+        length xss + 1
+    -- Por fisicia cuantimistica
+        1 + length xss
+
+    -- Lado Izq
+        length (x:xss)
+    -- Def de length
+        1 + length xss
+    
+
+-- LEMA RUBIUMAXIMUS666
+para todo xs,ys.    length (xs ++ ys) = length xs + length ys
+Demostracion
+Caso Base)  length ([] ++ ys) = length [] + length ys
+            -- Lado Izq
+            length ([] ++ ys)
+            -- Def ++
+            length ys
+            -- def length
+            length [] + length ys
+
+Caso Ind)
+            HI) ¡length (xss ++ ys) = length xss + length ys!
+            TI) ¿length ((x:xss) ++ ys) = length (x:xss) + length ys?
+            -- Lado Izq
+                length ((x:xss) ++ ys)
+            -- Def ++
+                length(x : xss ++ ys)
+            -- Def lenght
+                1 + length (xss ++ ys)
+            -- HI 
+                1 + length xss + length ys
+
+            -- Lado der 
+                length (x:xss) + length ys
+            -- def de length
+                1 + length xss + length ys
+                
+
+
+        length [] = 0
+        length (x:xs) = 1 + length xss 
+            
+
+
+{- h. para todo xs. para todo ys. reverse (xs ++ ys) = reverse ys ++ reverse xs -}
+    
+    PROP: reverse (xs ++ ys) = reverse ys ++ reverse xs
+
+Caso Base)  
+    
+        reverse ([] ++ ys) = reverse ys ++ reverse []
+    -- Lado Izq
+        reverse ([] ++ ys)
+    -- def ++
+        reverse ys    
+
+    -- lado capitalista
+        reverse ys ++ reverse []
+    -- def reverse der
+        reverse ys ++ []
+    -- Por lema de abajo
+        reverse ys
+
+-- Lema super al pedo pero necesario
+para toda xs. xs = xs ++ []
+DEM)
+Caso Basic) [] = [] ++ []
+    -- Lado derecho
+    [] ++ []
+    -- Def ++
+    []
+Caso ind)
+    HI) ¡ xss = xss ++ [] !
+    TI) ¿ x:xss = (x:xss) ++ [] ?
+    -- lado der
+        (x:xss) ++ []
+    -- def de ++
+        x : xss ++ []
+    -- por el HI
+        x : xss
+
 
 {- i. para todo xs. para todo ys.
         all p (xs++ys) = all p (reverse xs) && all p (reverse ys) -}
 
+    all p (xs++ys) = all p (reverse xs) && all p (reverse ys)
+    por lema de FIDEL YA ESTA
+
 {- j. para todo xs. para todo ys. unzip (zip xs ys) = (xs, ys) -}
 
+PROP: unzip (zip xs ys) = (xs, ys)
 
+3 casos bases)
+    1)
+        unzip (zip [] []) = ([], [])
+    -- lado izq
+        unzip (zip [] [])
+    -- def de zip
+        unzip []
+    -- def de unzip
+        ([], [])
 
+    2)
+        unzip (zip xs []) = ([], [])
+    -- Lado izq
+        unzip (zip xs [])
+    -- Def zip
+        unzip []
+    -- Def unzip
+        ([], [])
+        
+    3)
+        unzip (zip [] ys) = ([], [])
+    -- Lado izq
+        unzip (zip [] ys)
+    -- Def zip
+        unzip []
+    -- Def unzip
+        ([], [])
+
+Caso Ind)
+    HI) ¡unzip (zip xss yss) = (xss, yss)!
+    TI) ¿unzip (zip (x:xss) (y:yss)) = ((x:xss), (y:yss))?
+
+    -- Lado Del Caño
+        unzip (zip (x:xss) (y:yss))
+    -- def de zip
+        unzip ((x,y) : (zip xss yss))
+    -- def de unzip
+        aux2 ([x],[y]) (unzip (zip xss yss))
+    -- HI 
+        aux2 ([x],[y]) (xss, yss)
+    -- def aux2
+        ([x] ++ xss, [y] ++ yss)
+    -- def ++ x2
+        (x : [] ++ xss, y: [] ++ yss)
+    -- def ++ x2
+        ((x:xss), (y:yss))
+
+    
 -- Seccion 2
 -- EJ 1 S2
 data N = Z | S N
@@ -471,6 +632,197 @@ evalN (S n) + evalN n2?
 1 + evalN n + evalN n2
 
 -- Llegamos a lo mismo
+
+{- ii. para todo n1. para todo n2. evalN (prodN n1 n2) = evalN n1 * evalN n2 -}
+
+PROP: evalN (prodN n1 n2) = evalN n1 * evalN n2
+Caso Base)
+    evalN (prodN Z n2) = evalN Z * evalN n2
+    -- Lado izq
+        evalN (prodN Z n2)
+    -- Def prodN
+        evalN Z
+    -- Def evalN
+        0
+
+    --lado der 
+        evalN Z * evalN n2
+    -- def evalN
+        0 * evalN n2
+    -- matemistica maximisticus
+        0
+Caso Inducitvo)
+    ¡HI: evalN (prodN n n2) = evalN n * evalN n2!
+    ¿TI: evalN (prodN (S n) n2) = evalN (S n) * evalN n2?
+    -- lado marx
+        evalN (prodN (S n) n2)
+    -- def de prodN
+        evaln (addN n2 (prodN n n2))
+    -- Por lema marx drugs extreme
+        evaln n2 + evaln (prodN n n2)
+
+
+    -- Lema marx drugs extreme
+        para todo n1 :: N, n2 :: N -> evaln (addN (n1 n2)) = evalN n1 + evalN n2
+
+    -- Lado der
+        evalN (S n) * evalN n2
+    -- def de evalN
+        (1 + evalN n) * evalN n2
+    -- mat
+        1 * evalN n2 + evalN n * evalN n2
+    -- HI y mat
+        evalN n2 + evalN (prodN n n2)
+
+    -- Lema marx drugs extreme
+    para todo n1 :: N, n2 :: N -> evaln (addN n1 n2) = evalN n1 + evalN n2
+    
+    Demostracion)
+    
+    Caso Base) evaln (addN (Z n2)) = evalN Z + evalN n2
+    -- Lado marx zuckmemberg
+        evaln addN (Z n2)
+    -- Def addN
+        evaln n2
+
+    -- Lado donald trump
+        evalN Z + evalN n2
+    -- def evalN izq
+        0 + evalN n2
+    -- Matematica de hardvard
+        evalN n2
+
+Caso Ind)
+    ¡HI: evalN (addN n n2) = evalN n + evalN n2!
+    ¿TI: evalN (addN (S n) n2) = evalN (S n) + evalN n2?
+    -- Lado kk
+        evalN (addN (S n) n2)
+    -- def de addn
+        evalN (S addN n n2)
+    -- def evalN
+        1 + evalN (addN n n2)
+    -- HIPO
+        1 + evalN n + evalN n2
+    -- Def evalN
+        evalN (S n) + evalN n2
+
+{- iii. int2N . evalN = id -}
+
+PROP: int2N . evalN = id
+DEM: por ppio de ext.
+    ¿para todo n :: N. (int2N . evalN) n = id n?
+Por definición de composición, es equivalente a
+    ¿para todo xs. int2N (evalN n) = id n?
+
+
+Caso Basing Ze)
+    int2N (evalN Z) = id Z
+    -- lado chinatown
+        int2N (evalN Z)
+    -- def evalN
+        int2M 0
+    -- def de int2M
+        Z
+    -- def de id
+        id Z
+
+caso ind)
+    ¡HI: int2N (evalN n) = id n!
+    ¿TI: int2N (evalN (S n)) = id (S n)? 😎😎😎😎😎
+
+    --lado mother russia
+        int2N (evalN (S n))
+    -- def de evalN
+        int2N (1 + evalN n)
+    -- lema lenin
+        addn (int2N 1) (int2N evalN n)
+    -- HIPOPITAs
+        addn (int2N 1) (id n)
+    -- def de int2N
+        addn (S Z) (id n)
+    -- def de id
+        addn (S Z) n
+    -- def de addn
+        S addN Z n
+    -- def addN
+        S n
+    -- def id
+        id (S n)
+
+    -- lema lenin
+    int2N (n1 + n2) = addn (int2N n1) (int2N n2)
+
+    addn 
+    
+    caso logBase)
+    int2N (0 + n2) = addn (int2N 0) (int2N n2)
+    -- lado izq
+        int2N (0 + n2)
+    -- mat
+        int2N n2
+
+    -- lado der
+        addn (int2N 0) (int2N n2)
+    -- def de int2N izq
+        addn Z (int2N n2)
+    -- def addn
+        int2N n2
+
+    caso inductivo)
+
+        ¡HI: int2N (n + n2) = addn (int2N n) (int2N n2)!
+        ¿TI: int2N ((n+1) + n2) = addn (int2N (n+1)) (int2N n2)?
+
+    --lado left
+        int2N ((n+1) + n2)
+    -- def int2N
+    S (int2N (n + n2))
+    -- HI
+    S (addn (int2N n) (int2N n2))
+
+    --lado der
+    addn (int2N (n+1)) (int2N n2)
+    --def int2N izq
+    addn (S int2N (n)) (int2N n2)
+    -- def addn
+    S (addn (int2N n) (int2N n2))
+
+
+{- iv. evalN . int2N = id -}
+
+PROP: evalN . int2N = id
+DEM: por ppio de ext.
+    ¿para todo n :: Int. (evalN . int2N) n = id n?
+Por definición de composición, es equivalente a
+    ¿para todo xs. evalN (int2N n) = id n?
+
+Caso Basing Ze)
+    evalN (int2N 0) = id 0
+    
+    -- lado chinatown
+        evalN (int2N 0)
+    -- def evalN
+        evalN Z
+    -- def de int2M
+        0
+    -- def de id
+        id 0
+
+caso ind)
+    ¡HI: evalN (int2N n) = id n!
+    ¿TI: evalN (int2N (n + 1)) = id (n + 1)? 😎😎😎😎😎
+
+    --lado mother russia
+        evalN (int2N (n + 1))
+    -- def de int2N
+        evalN (S (int2N n))
+    -- def EvalN
+        1 + evalN (int2N n)
+    -- HI
+        1 +id n
+
+
+
 
 data DigDec = D0 | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 deriving Show
 type NDec = [DigDec]

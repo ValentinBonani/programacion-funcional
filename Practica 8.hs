@@ -819,8 +819,13 @@ caso ind)
     -- def EvalN
         1 + evalN (int2N n)
     -- HI
-        1 +id n
-
+        1 + id n
+    -- def id
+        1 + n
+    -- mat
+        n + 1
+    --def id
+        id (n + 1)
 
 
 

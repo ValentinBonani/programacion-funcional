@@ -587,7 +587,7 @@ evalN (S n) = 1 + evalN n
 
 addN :: N -> N -> N
 addN Z n2 = n2
-addN (S n) n2 = S addN n n2
+addN (S n) n2 = S (addN n n2)
 
 prodN :: N -> N -> N
 prodN Z n2 = Z
@@ -827,7 +827,193 @@ caso ind)
     --def id
         id (n + 1)
 
+-- Seccion II EJ 2
 
+
+type NU = [Unit]
+
+evalNU :: NU -> Int
+evalNU [] = 0
+evalNU (_:us) = 1 + evalNU us
+
+
+succNU :: NU -> NU
+succNU n = () : n
+
+addNU :: NU -> NU -> NU
+addNU n1 n2 = n1 ++ n2
+
+nu2n :: NU -> N
+nu2n [] = Z
+nu2n (n:nu) = S (nu2n nu)
+
+n2nu :: N -> NU
+n2nu Z = []
+n2nu (S n) = () : (n2nu n)
+
+-- EJ 2 B
+{- S2E2Bi -}
+PROP: evalNU . succNU = (+1) . evalNU
+DEM: por ppio de ext.
+    ¿para todo xs. (evalNU . succNU) n = ((+1) . evalNU) n?
+Por definición de composición x2, es equivalente a
+    ¿para todo xs. evalNU (succNU n) = (+1) (evalNU n)?
+
+caso BASE)
+    evalNU (succNU []) = (+1) (evalNU [])
+    -- lado izq
+        evalNU (succNU [])
+    --def de succNu
+        evalNU [()]
+    -- def de evalNU
+        1 + evalNU []
+    -- def de evalNU
+        1 + 0
+    -- matesito
+        1
+        
+    -- Lado derecho
+        (+1) (evalNU [])
+    -- Def evalNU
+        (+1) 0
+    -- Def +1
+        1
+
+Caso Ind)
+    ¡HI: evalNU (succNU nu) = (+1) (evalNU nu)!
+    ¿TI: evalNU (succNU (n:nu)) = (+1) (evalNU (n:nu))? 😎😎😎😎😎
+
+    -- lado izq
+        evalNU (succNU (n:nu))
+    -- def de suc
+        evalNU (() : (n:nu))
+    -- def evalNU
+        1 + evalNU (n:nu)
+    -- def evalNU
+        1 + 1 + evalNU nu
+
+    -- lado der 
+        (+1) (evalNU (n:nu))
+    -- def de evalNU
+        (+1) (1 + evalNU nu)
+    -- def de +1
+        1 + 1 + evalNU nu
+
+{- S2E2Bii -}
+ii. para todo n1. para todo n2.
+evalNU (addNU n1 n2) = evalNU n1 + evalNU n2
+
+PROP: evalNU (addNU n1 n2) = evalNU n1 + evalNU n2
+
+Caso Base)
+    evalNU (addNU [] n2) = evalNU [] + evalNU n2
+    -- Lado Izq
+    evalNU (addNU [] n2) 
+    -- Def addNU
+    evalNU ([] ++ n2)
+    -- Por lema al pedo ya demostrado
+    evalNU n2
+
+    -- lado der
+        evalNU [] + evalNU n2
+    -- def de evalNU
+        0 + evalNU n2
+    -- matienzo
+        evalNU n2
+
+Caso Ind)
+    ¡HI: evalNU (addNU nu n2) = evalNU nu + evalNU n2!
+    ¿TI: evalNU (addNU (n:nu) n2) = evalNU (n:nu) + evalNU n2? 😎😎😎😎😎
+    
+    -- lado izq
+        evalNU (addNU (n:nu) n2)
+    -- def de addNU
+        evalNU ((n:nu) ++ n2)
+    -- def ++ 
+        evalNU (n : (nu ++ n2))
+    -- def de evalNU
+        1 + evalNU (nu ++ n2)
+    -- Lema shrodringerNU
+        1 + evalNU nu + evalNU n2
+
+    -- Lema de shrodringerNU
+        para todo xs,ys :: NU
+            evalNU (xs ++ ys) = evalNU xs + evalNU ys
+
+    -- lado der
+        evalNU (n:nu) + evalNU n2
+    -- def evalNU
+        1 + evalNU nu + evalNU n2
+    
+    ++ [] ys = ys
+    ++ (x:xs) ys = x : (xs ++ ys)
+
+-- demostracion lema shrodringerNU
+para todo xs,ys :: NU
+            evalNU (xs ++ ys) = evalNU xs + evalNU ys
+
+Caso Base)
+        evalNU ([] ++ ys) = evalNU [] + evalNU ys
+        -- lado izq
+            evalNU ([] ++ ys)
+        -- def ++ 
+            evalNU ys
+        -- def evalNU
+            evalNU [] + evalNU ys
+        
+Caso Ind)
+    ¡HI: evalNU (xss ++ ys) = evalNU xss + evalNU ys!
+    ¿TI: evalNU ((x:xss) ++ ys) = evalNU (x:xss) + evalNU ys? 😎😎😎😎😎
+    -- lado izq 
+        evalNU ((x:xss) ++ ys)
+    -- def ++
+        evalNU (x: (xss ++ ys))
+    -- def evalNU
+        1 + evalNU (xss ++ ys)
+    -- HIMAN
+        1 + evalNU xss + evalNU ys
+    
+    -- lado der
+        evalNU (x:xss) + evalNU ys
+    -- def evalNU
+        1 + evalNU xss + evalNU ys
+
+
+-- Seccion 2 EJ 3
+data DigBin = O | I deriving Show
+
+type NBin = [DigBin]
+
+dbAsInt :: DigBin -> Int
+dbAsInt O = 0
+dbAsInt I = 1
+
+dbAsBool :: DigBin -> Bool
+dbAsBool O = False
+dbAsBool I = True
+
+dbOfBool :: Bool -> DigBin
+dbOfBool False = O
+dbOfBool True = I
+
+
+negDB :: DigBin -> DigBin
+negDB O = I
+negDB I = O
+
+
+evalNB :: NBin -> Int
+evalNB [] = 0
+evalNB (n:nb) = dbAsInt n + 2 * evalNB nb
+
+normalizarNB :: NBin -> NBin
+normalizarNB [] = []
+normalizarNB (n:nb) = if (isEmpty (n:nb)) then [] else n : normalizarNB nb
+
+isEmpty :: NBin -> Bool
+isEmpty [] = True
+isEmpty (x:xs) = if (dbAsBool x) then False else isEmpty xs
+-- Seccion 2 EJ 4
 
 data DigDec = D0 | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 deriving Show
 type NDec = [DigDec]
@@ -835,3 +1021,24 @@ type NDec = [DigDec]
 normalizarND :: NDec -> NDec
 normalizarND [] = []
 normalizarND (x:xs) = x == D0 || normalizarND  xs
+
+succNB :: NBin -> NBin
+succNB [] = [I]
+succNB (I:nb) = O : succNB nb
+succNB (O:nb) = I : nb
+
+addNB :: NBin -> NBin -> NBin
+addNB [] ys = ys
+addNB (O:xs) (y:ys) = y : addNB xs ys
+addNB (I:xs) (O:ys) = I : addNB xs ys
+addNB (I:xs) (I:ys) = O : addNB xs (succNB ys)
+
+
+nb2n :: NBin -> N
+nb2n [] = Z
+nb2n (O:nb) = prodN (S (S Z)) (nb2n nb)
+nb2n (I:nb) = S (prodN (S (S Z)) (nb2n nb))
+
+n2nb :: N -> NBin
+n2nb Z = []
+n2nb (S n) = succNB (n2nb n)

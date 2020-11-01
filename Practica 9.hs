@@ -94,7 +94,7 @@ countLeaves EmptyT = 1
 countLeaves (NodeT _ ab1 ab2) = countLeaves ab1 + countLeaves ab2
 
 heightT :: Tree a -> Int
-heightT EmptyT = 1
+heightT EmptyT = 0
 heightT (NodeT _ ab1 ab2) = max (1 + heightT ab1) (1 + heightT ab2)
 
 inOrder :: Tree a -> [a]
@@ -130,7 +130,185 @@ levelN act (NodeT _ ab1 ab2) = (levelN (act-1) ab1) ++ (levelN (act-1) ab2)
 (++++) [[]] [[]] = [[]]
 (++++) xs ys = xs ++ ys
 
+ramaMasLarga :: Tree a -> [a]
+ramaMasLarga EmptyT = []
+ramaMasLarga (NodeT e ab1 ab2) = if(heightT ab1 > heightT ab2) then e : ramaMasLarga ab1 else e : ramaMasLarga ab2
+
+
 todosLosCaminos :: Tree a -> [[a]]
 todosLosCaminos EmptyT = [[]]
 todosLosCaminos (NodeT e ab1 ab2) = map (e:) ((todosLosCaminos ab1) ++++ (todosLosCaminos ab2))
+    
+-- EJ4Bi
 
+PROP: heightT = length . ramaMasLarga
+DEM: por ppio de ext.
+    ¿para todo ab. heightT ab = (length . ramaMasLarga) ab?
+Por definición de composición, es equivalente a
+    ¿para todo ab. heightT ab = length (ramaMasLarga ab)? 
+
+
+Caso Base)
+    heightT EmptyT = length (ramaMasLarga EmptyT)
+    -- lado izq
+    heightT EmptyT
+    -- def height
+    0
+
+    -- lado der
+    length (ramaMasLarga EmptyT)
+    -- def ramaMasLarga
+    length ([])
+    -- def length 
+    0
+
+Caso Ind)
+        ¡HI.1: heightT ab1 = length (ramaMasLarga ab1)! 😎
+        ¡HI.2: heightT ab2 = length (ramaMasLarga ab2)! 😎 😎
+        ¿TI: heightT (NodeT e ab1 ab2)  = length (ramaMasLarga (NodeT e ab1 ab2))?   😎 😎 😎
+        -- lado derecho
+            length (ramaMasLarga (NodeT e ab1 ab2))
+        -- def ramaMasLarga
+            length (if(heightT ab1 > heightT ab2) then e : ramaMasLarga ab1 else e : ramaMasLarga ab2)
+        -- lema if-lenght
+            if(heightT ab1 > heightT ab2) then length (e : ramaMasLarga ab1) else length (e : ramaMasLarga ab2))
+        -- def Lenght x2
+            if(heightT ab1 > heightT ab2) then (1 + length (ramaMasLarga ab1)) else (1 + length ( ramaMasLarga ab2))
+        -- HI.1 && HI.2
+            if(heightT ab1 > heightT ab2) then (1 + heightT ab1) else (1 + heightT ab2)
+
+
+        -- lado izq
+            heightT (NodeT e ab1 ab2)
+        -- def heightT
+            max (1 + heightT ab1) (1 + heightT ab2)
+        -- def max
+            if((1 + heightT ab1) > (1 + heightT ab2)) then (1 + heightT ab1) else (1 + heightT ab2)
+        -- matematica del >
+            if(heightT ab1 > heightT ab2) then (1 + heightT ab1) else (1 + heightT ab2)
+            
+
+        -- Lema                
+        para todo a::Bool y para todo b,c :: [d]
+            length (if(a) then b else c) = if(a) then length b else length c
+        2 Casos) 
+        a = False
+            length (if(False) then b else c) = if(False) then length b else length c
+            -- def if
+            length c = length c
+        
+        a = True
+            length (if(False) then b else c) = if(False) then length b else length c
+            -- def if
+            length b = length b
+
+data Tree a = EmptyT 
+    | NodeT a (Tree a) (Tree a)
+    deriving Show
+
+heightT :: Tree a -> Int
+heightT EmptyT = 0
+heightT (NodeT _ ab1 ab2) = max (1 + heightT ab1) (1 + heightT ab2)
+
+ramaMasLarga :: Tree a -> [a]
+ramaMasLarga EmptyT = []
+ramaMasLarga (NodeT e ab1 ab2) = if(heightT ab1 > heightT ab2) then e : ramaMasLarga ab1 else e : ramaMasLarga ab2
+
+-- EJ4Bii
+
+PROP: reverse . inOrder = inOrder . mirrorT
+DEM: por ppio de ext.
+    ¿para todo ab. (reverse . inOrder) ab = (inOrder . mirrorT) ab?
+Por definición de composición, es equivalente a
+    ¿para todo ab. reverse (inOrder ab) = inOrder (mirrorT ab)? 
+
+Caso Base)
+    reverse (inOrder EmptyT) = inOrder (mirrorT EmptyT)
+    -- Lado Izq 
+        reverse (inOrder EmptyT)
+    -- def inorder
+        reverse ([])
+    -- def reverse
+        []
+
+    -- Lado Derecho
+        inOrder (mirrorT EmptyT)
+    -- Def mirrorT
+        inOrder EmptyT
+    -- def inOrder
+        []
+
+Caso Ind)
+        ¡HI.1: reverse (inOrder ab1) = inOrder (mirrorT ab1)! 😎
+        ¡HI.2: reverse (inOrder ab2) = inOrder (mirrorT ab2)! 😎 😎
+        ¿TI: reverse (inOrder (NodeT n ab1 ab2)) = inOrder (mirrorT (NodeT n ab1 ab2))?   😎 😎 😎
+
+        -- izq
+            reverse (inOrder (NodeT n ab1 ab2))
+        -- def inorder
+            reverse (inOrder ab1 ++ [n] ++ inOrder ab2)
+        -- Lema reversero
+            reverse (inOrder ab2) ++ reverse [n] ++ reverse (inOrder ab1)
+        -- def reverse
+            reverse (inOrder ab2) ++ (reverse [] ++ [n]) ++ reverse (inOrder ab1)
+        -- def reverse
+            reverse (inOrder ab2) ++ ([] ++ [n]) ++ reverse (inOrder ab1)
+        -- def ++
+            reverse (inOrder ab2) ++ [n] ++ reverse (inOrder ab1)
+        
+        -- lado der
+            inOrder (mirrorT (NodeT n ab1 ab2))
+        -- def mirrorT
+            inOrder (NodeT n (mirrorT ab2) (mirrorT ab1))
+        -- def inOrder
+            inOrder (mirrorT ab2) ++ [n] ++ inOrder (mirrorT ab1)
+        -- HI.1 && HI.2
+            reverse (inOrder ab2) ++ [n] ++ reverse (inOrder ab1)
+
+        lema reversero
+        reverse (xs ++ ys ++ zs) = reverse zs ++ reverse ys ++ reverse xs
+
+        Caso Base)
+        reverse ([] ++ [] ++ []) = reverse [] ++ reverse [] ++ reverse []
+        -- lado izq 
+            reverse ([] ++ [] ++ [])
+        -- def ++ x2
+            reverse ([])
+        -- def reverse
+            []
+        
+        
+        -- lado der
+            reverse [] ++ reverse [] ++ reverse []
+        -- dedf reverse * 3
+            [] ++ [] ++ []
+        -- def ++ *2
+            []
+
+        Caso Ind)
+        ¡HI: reverse (xs ++ ys ++ zs) = reverse zs ++ reverse ys ++ reverse xs! 😎
+        ¿TI: reverse ((x:xs) ++ (y:ys) ++ (z:zs)) = reverse (z:zs) ++ reverse (y:ys) ++ reverse (x:xs)?   😎 😎 😎
+        -- izq 
+            reverse ((x:xs) ++ (y:ys) ++ (z:zs))
+        -- def ++
+            reverse (x: (xs ++ (y:ys)) ++ (z:zs))
+        -- def reverse
+            reverse ((xs ++ (y:ys)) ++ (z:zs)) ++ [x]
+
+
+        -- lado derecho
+            reverse (z:zs) ++ reverse (y:ys) ++ reverse (x:xs)
+        -- def reverse *3
+            reverse zs ++ [z] ++ reverse ys ++ [y] ++ reverse xs ++ [x]
+
+mirrorT :: Tree a -> Tree a
+mirrorT EmptyT = EmptyT
+mirrorT (NodeT n ab1 ab2) = NodeT n (mirrorT ab2) (mirrorT ab1)
+
+inOrder :: Tree a -> [a]
+inOrder EmptyT = []
+inOrder (NodeT n ab1 ab2) = inOrder ab1 ++ [n] ++ inOrder ab2
+
+reverse :: [a] -> [a]
+reverse EmptyT = []
+reverse (x:xs) = reverse xs ++ [x]

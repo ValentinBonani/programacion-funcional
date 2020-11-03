@@ -312,3 +312,96 @@ inOrder (NodeT n ab1 ab2) = inOrder ab1 ++ [n] ++ inOrder ab2
 reverse :: [a] -> [a]
 reverse EmptyT = []
 reverse (x:xs) = reverse xs ++ [x]
+
+
+-- EJERCICIO 4
+
+data AppList a = Single a | Append (AppList a) (AppList a) deriving Show
+
+lenAL :: AppList a -> Int
+lenAL (Single _) = 1
+lenAL (Append l1 l2) = lenAL l1 + lenAL l2
+
+consAL :: a -> AppList a -> AppList a
+consAL a l = Append (Single a) l
+
+headAL :: AppList a -> a
+headAL (Single n) = n
+headAL (Append l1 _) = headAL l1
+
+tailAL :: AppList a -> AppList a
+tailAL (Single _) = error "La lista no puede estar vacia"
+tailAL (Append (Single _) l2) = l2
+tailAL (Append l1 l2) = Append (tailAL l1) l2
+
+snocAL :: a -> AppList a -> AppList a
+snocAL n l = Append l (Single n)
+
+lastAL :: AppList a -> a
+lastAL (Single n) = n
+lastAL (Append _ l2) = lastAL l2
+
+initAL :: AppList a -> AppList a
+initAL (Single _) = error "La lista no puede estar vacia"
+initAL (Append l1 (Single _)) = l1
+initAL (Append l1 l2) = Append l1 (initAL l2)
+
+reverseAL :: AppList a -> AppList a
+reverseAL (Single n) = Single n
+reverseAL (Append l1 l2) = Append (reverseAL l2) (reverseAL l1)
+
+elemAL :: Eq a => a -> AppList a -> Bool
+elemAL n (Single e) = n == e  
+elemAL n (Append l1 l2) = elemAL n l1 || elemAL n l2
+
+appendAL :: AppList a -> AppList a -> AppList a
+appendAL al1 al2 = Append al1 al2
+
+appListToList :: AppList a -> [a]
+appListToList (Single n) = [n]
+appListToList (Append l1 l2) = appListToList l1 ++ appListToList l2
+
+list = Append (Append (Single 2) (Single 1)) (Single 3)
+
+
+-- Ejercicio 5
+
+PROP: reverseAL . reverseAL = id
+DEM: por ppio de ext.
+    ¿para todo appList :: AppList a. (reverseAL . reverseAL) appList = id appList?
+Por definición de composición, es equivalente a
+    ¿para todo appList :: AppList a. reverseAL (reverseAL appList) = id appList?
+
+Caso Base)
+        reverseAL (reverseAL (Single n)) = id (Single n)
+    -- Lado Izq
+        reverseAL (reverseAL (Single n))
+    -- = (reverseAL.1)
+        reverseAL (Single n)
+    -- = (reverseAL.1)
+        Single n
+    -- = (id)
+        id (Single n)
+
+Caso Inductivo)
+    ¡HI.1: reverseAL (reverseAL l1) = id l1! 😎
+    ¡HI.2: reverseAL (reverseAL l2) = id l2! 😎 😎
+    ¿TI: reverseAL (reverseAL (Append l1 l2)) = id (Append l1 l2)?   😎 😎 😎
+
+    -- Lado Izq
+        reverseAL (reverseAL (Append l1 l2))
+    -- = (reverseAL.2)
+        reverseAL (Append (reverseAL l2) (reverseAL l1))
+    -- = (reverseAL.2)
+        Append (reverseAL (reverseAL l1)) (reverseAL (reverseAL l2))
+    -- = HI.1 && HI.2
+        Append (id l1) (id l2)
+    -- = (id) * 2
+        Append l1 l2
+    -- = (id)
+        id (Append l1 l2)
+
+
+reverseAL :: AppList a -> AppList a
+reverseAL (Single n) = Single n
+reverseAL (Append l1 l2) = Append (reverseAL l2) (reverseAL l1)

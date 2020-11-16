@@ -351,7 +351,7 @@ reverseAL (Single n) = Single n
 reverseAL (Append l1 l2) = Append (reverseAL l2) (reverseAL l1)
 
 elemAL :: Eq a => a -> AppList a -> Bool
-elemAL n (Single e) = n == e  
+elemAL n (Single e) = n == e
 elemAL n (Append l1 l2) = elemAL n l1 || elemAL n l2
 
 appendAL :: AppList a -> AppList a -> AppList a
@@ -384,15 +384,15 @@ Caso Base)
         id (Single n)
 
 Caso Inductivo)
-    ¡HI.1: reverseAL (reverseAL l1) = id l1! 😎
+    ¡HI.1: reverseAL (reverseAL l1) = id l1! 🗿
     ¡HI.2: reverseAL (reverseAL l2) = id l2! 😎 😎
     ¿TI: reverseAL (reverseAL (Append l1 l2)) = id (Append l1 l2)?   😎 😎 😎
 
     -- Lado Izq
         reverseAL (reverseAL (Append l1 l2))
-    -- = (reverseAL.2)
+    -- = (reverseAL.2) derecho
         reverseAL (Append (reverseAL l2) (reverseAL l1))
-    -- = (reverseAL.2)
+    -- = (reverseAL.2) izquierdo
         Append (reverseAL (reverseAL l1)) (reverseAL (reverseAL l2))
     -- = HI.1 && HI.2
         Append (id l1) (id l2)

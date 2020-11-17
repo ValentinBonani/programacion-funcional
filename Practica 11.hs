@@ -22,6 +22,12 @@ soloLasCapasQue f (Capa i p) =  (if f i then Capa i else id) (soloLasCapasQue f 
 esQueso :: Ingrediente -> Bool
 esQueso Queso = True
 esQueso _ = False
+
+esAceituna :: Ingrediente -> Bool
+esAceituna (Aceitunas _) = True
+esAceituna _ = False
+
+
  
 sinLactosa :: Pizza -> Pizza
 sinLactosa = soloLasCapasQue (not . esQueso)
@@ -52,3 +58,46 @@ cantidadCapasQueCumplen' f = pizzaProcesada (\i z -> fromEnum (f i) + z) 0
 
 {- cantidadCapasQueCumplen' f = pizzaProcesada ((+) . fromEnum . f) 0
  -}
+
+conCapasTransformadas' :: (Ingrediente -> Ingrediente) -> Pizza -> Pizza
+conCapasTransformadas' ingTransformer = pizzaProcesada (Capa . ingTransformer) Prepizza
+
+soloLasCapasQue' :: (Ingrediente -> Bool) -> Pizza -> Pizza
+soloLasCapasQue' matchPredicate = pizzaProcesada (\i z -> if matchPredicate i then Capa i z else z) Prepizza
+
+sinLactosa' :: Pizza -> Pizza
+sinLactosa' = pizzaProcesada (\i z -> if (not . esQueso) i then Capa i z else z) Prepizza
+
+aptaIntolerantesLactosa' :: Pizza -> Bool
+aptaIntolerantesLactosa' = pizzaProcesada (\i z -> (not . esQueso) i && z) True
+
+cantidadDeQueso' :: Pizza -> Int
+cantidadDeQueso' = pizzaProcesada ((+) . fromEnum . esQueso) 0
+
+conElDobleDeAceitunas' :: Pizza -> Pizza
+conElDobleDeAceitunas' = pizzaProcesada (Capa . aceitunaDuplicator) Prepizza
+
+-- Ejercicio 5
+
+cantidadAceitunas :: Pizza -> Int
+cantidadAceitunas = pizzaProcesada ((+) . fromEnum . esAceituna) 0
+
+capasQueCumplen :: (Ingrediente -> Bool) -> Pizza -> [Ingrediente]
+capasQueCumplen p = pizzaProcesada (\i z -> if p i then i : z else z) []
+
+conDescripcionMejorada :: Pizza -> Pizza
+conDescripcionMejorada = pizzaProcesada juntarAceitunas Prepizza
+
+juntarAceitunas :: Ingrediente -> Pizza -> Pizza
+juntarAceitunas (Aceitunas n) (Capa (Aceitunas m) p) = Capa (Aceitunas (n + m)) p
+juntarAceitunas i p = Capa i p
+
+tieneAceitunaAdelante :: Pizza -> Bool
+tieneAceitunaAdelante (Capa (Aceitunas _) _) = True
+tieneAceitunaAdelante _ = False
+
+getAceitunas :: Pizza -> Int
+getAceitunas (Capa (Aceitunas n) _) = n
+
+conCapasDe :: Pizza -> Pizza -> Pizza
+conCapasDe = pizzaProcesada (\i z -> Capa i z) 

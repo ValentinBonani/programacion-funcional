@@ -52,3 +52,23 @@ cantidadCapasQueCumplen' f = pizzaProcesada (\i z -> fromEnum (f i) + z) 0
 
 {- cantidadCapasQueCumplen' f = pizzaProcesada ((+) . fromEnum . f) 0
  -}
+
+conCapasTransformadas' :: (Ingrediente -> Ingrediente) -> Pizza -> Pizza
+conCapasTransformadas' ingTransformer = pizzaProcesada (Capa . ingTransformer) Prepizza
+
+soloLasCapasQue' :: (Ingrediente -> Bool) -> Pizza -> Pizza
+soloLasCapasQue' matchPredicate = pizzaProcesada (\i z -> if matchPredicate i then Capa i z else z) Prepizza
+
+sinLactosa' :: Pizza -> Pizza
+sinLactosa' = pizzaProcesada (\i z -> if (not . esQueso) i then Capa i z else z) Prepizza
+
+aptaIntolerantesLactosa' :: Pizza -> Bool
+aptaIntolerantesLactosa' = pizzaProcesada (\i z -> (not . esQueso) i && z) True
+
+cantidadDeQueso' :: Pizza -> Int
+cantidadDeQueso' = pizzaProcesada ((+) . fromEnum . esQueso) 0
+
+conElDobleDeAceitunas' :: Pizza -> Pizza
+conElDobleDeAceitunas' = pizzaProcesada (Capa . aceitunaDuplicator) Prepizza
+
+-- Ejercicio 5

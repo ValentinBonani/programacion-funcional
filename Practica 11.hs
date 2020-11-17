@@ -22,6 +22,12 @@ soloLasCapasQue f (Capa i p) =  (if f i then Capa i else id) (soloLasCapasQue f 
 esQueso :: Ingrediente -> Bool
 esQueso Queso = True
 esQueso _ = False
+
+esAceituna :: Ingrediente -> Bool
+esAceituna (Aceitunas _) = True
+esAceituna _ = False
+
+
  
 sinLactosa :: Pizza -> Pizza
 sinLactosa = soloLasCapasQue (not . esQueso)
@@ -72,3 +78,26 @@ conElDobleDeAceitunas' :: Pizza -> Pizza
 conElDobleDeAceitunas' = pizzaProcesada (Capa . aceitunaDuplicator) Prepizza
 
 -- Ejercicio 5
+
+cantidadAceitunas :: Pizza -> Int
+cantidadAceitunas = pizzaProcesada ((+) . fromEnum . esAceituna) 0
+
+capasQueCumplen :: (Ingrediente -> Bool) -> Pizza -> [Ingrediente]
+capasQueCumplen p = pizzaProcesada (\i z -> if p i then i : z else z) []
+
+conDescripcionMejorada :: Pizza -> Pizza
+conDescripcionMejorada = pizzaProcesada juntarAceitunas Prepizza
+
+juntarAceitunas :: Ingrediente -> Pizza -> Pizza
+juntarAceitunas (Aceitunas n) (Capa (Aceitunas m) p) = Capa (Aceitunas (n + m)) p
+juntarAceitunas i p = Capa i p
+
+tieneAceitunaAdelante :: Pizza -> Bool
+tieneAceitunaAdelante (Capa (Aceitunas _) _) = True
+tieneAceitunaAdelante _ = False
+
+getAceitunas :: Pizza -> Int
+getAceitunas (Capa (Aceitunas n) _) = n
+
+conCapasDe :: Pizza -> Pizza -> Pizza
+conCapasDe = pizzaProcesada (\i z -> Capa i z) 
